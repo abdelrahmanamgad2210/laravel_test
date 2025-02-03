@@ -1,0 +1,51 @@
+name: Deploy Laravel App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Laravel to DigitalOcean
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.KEY }}" | tr -d '\r' > ~/.ssh/id_digitalocean
+          chmod 600 ~/.ssh/id_digitalocean
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+      - name: Test SSH Connection
+        run: ssh -i ~/.ssh/id_digitalocean -o StrictHostKeyChecking=no root@${{ secrets.HOST }} "echo '✅ SSH Connected'"
+
+      - name: Build Laravel Docker Image
+        run: |
+          docker build -t laravel-app:latest .
+          docker save -o laravel-app.tar laravel-app:latest 
+
+      - name: Copy Docker Image to DigitalOcean
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: root
+          key: ${{ secrets.KEY }}
+          source: laravel-app.tar
+          target: /root/
+
+      - name: Deploy on DigitalOcean
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: root
+          key: ${{ secrets.KEY }}
+          script: |
+            docker load -i /root/laravel-app.tar
+            docker-compose down
+            docker-compose up -d --build
+            docker system prune -af
