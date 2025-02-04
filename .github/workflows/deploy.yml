@@ -29,7 +29,7 @@ jobs:
         run: |
           docker build -t laravel-app:latest .
           docker save -o laravel-app.tar laravel-app:latest 
-          chmod 600 laravel-app.tar
+          chmod 644 laravel-app.tar
 
       - name: Copy Docker Image to DigitalOcean
         uses: appleboy/scp-action@v0.1.7
