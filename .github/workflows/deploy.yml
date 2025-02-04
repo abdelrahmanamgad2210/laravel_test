@@ -17,7 +17,7 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | base64 --decode > ~/.ssh/testing_id
+          ~/.ssh/testing_id
           chmod 600 ~/.ssh/testing_id
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
       
