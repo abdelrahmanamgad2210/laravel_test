@@ -23,7 +23,7 @@ jobs:
       
 
       - name: Test SSH Connection
-        run: ssh -i ~/.ssh/testing_id -o StrictHostKeyChecking=no root@${{ secrets.HOST }} "echo '✅ SSH Connected'"
+        run: ssh -i ~/.ssh/testing_id root@${{ secrets.HOST }} "echo '✅ SSH Connected'"
 
       - name: Build Laravel Docker Image
         run: |
