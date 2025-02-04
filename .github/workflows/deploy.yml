@@ -17,13 +17,13 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | base64 --decode > ~/.ssh/id_digitalocean
-          chmod 600 ~/.ssh/id_digitalocean
+          echo "${{ secrets.KEY }}" | base64 --decode > ~/.ssh/testing_id
+          chmod 600 ~/.ssh/testing_id
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
       
 
       - name: Test SSH Connection
-        run: ssh -i ~/.ssh/id_digitalocean -o StrictHostKeyChecking=no root@${{ secrets.HOST }} "echo '✅ SSH Connected'"
+        run: ssh -i ~/.ssh/testing_id -o StrictHostKeyChecking=no root@${{ secrets.HOST }} "echo '✅ SSH Connected'"
 
       - name: Build Laravel Docker Image
         run: |
