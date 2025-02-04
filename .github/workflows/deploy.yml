@@ -19,6 +19,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.KEY }}" | tr -d '\r' > ~/.ssh/testing_id
           chmod 600 ~/.ssh/testing_id
+          chmod 700 ~/.ssh
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
       
 
