@@ -31,6 +31,13 @@ jobs:
           docker save -o laravel-app.tar laravel-app:latest 
           chmod 644 laravel-app.tar
 
+      - name: Test SCP Manually
+        run: |
+            ls -lah ~/.ssh/
+            cat ~/.ssh/testing_id
+            ssh -i ~/.ssh/testing_id root@${{ secrets.HOST }} "echo '✅ SSH Still Works!'"
+        
+
       - name: Copy Docker Image to DigitalOcean
         uses: appleboy/scp-action@v0.1.7
         with:
