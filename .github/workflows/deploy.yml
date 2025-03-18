@@ -18,7 +18,10 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa                
+          chmod 644 ~/.ssh/id_rsa.pub    
+
+
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
       
       - name: Debug SSH Key Permissions
