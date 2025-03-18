@@ -22,7 +22,10 @@ jobs:
           chmod 700 ~/.ssh
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
-      
+          
+      - name: Debug SSH Key Permissions
+        run: ls -lah ~/.ssh && cat ~/.ssh/testing_id
+        
 
       - name: Test SSH Connection
         run: ssh -i ~/.ssh/testing_id root@${{ secrets.HOST }} "echo '✅ SSH Connected'"
