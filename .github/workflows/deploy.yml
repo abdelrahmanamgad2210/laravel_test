@@ -14,19 +14,23 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup SSH Key (Decrypting the Private Key)
+      - name: Setup SSH Key with Passphrase
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | base64 --decode > ~/.ssh/id_rsa
+          echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
-
-      - name: Decrypt SSH Key (Fix libcrypto error)
+      
+      - name: Debug SSH Key Permissions
+        run: |
+            ls -lah ~/.ssh
+            stat ~/.ssh/id_rsa
+        
+      - name: Start SSH Agent and Load Key
         run: |
           eval "$(ssh-agent -s)"
-          ssh-keygen -p -P "${{ secrets.PASSPHRASE }}" -N "" -f ~/.ssh/id_rsa
-          ssh-add ~/.ssh/id_rsa
-          ssh-add -l  # List added keys for debugging
+          echo "${{ secrets.PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
+          ssh-add -l  # Debugging: List added keys
 
       - name: Test SSH Connection
         run: ssh -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH Connected'"
