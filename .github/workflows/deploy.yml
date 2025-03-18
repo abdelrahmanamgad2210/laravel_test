@@ -17,33 +17,31 @@ jobs:
       - name: Setup SSH Key with Passphrase
         run: |
           mkdir -p ~/.ssh
-          printf "%s\n" "${{ secrets.KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.KEY }}" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
 
-      - name: Debug SSH Key Permissions
+      - name: Debug SSH Key Presence
         run: |
+          echo "Checking if the SSH key exists..."
           ls -lah ~/.ssh
-          stat ~/.ssh/id_rsa
-
-      - name: Verify Key Existence
-        run: |
-          if [ -f ~/.ssh/id_rsa ]; then
-            echo "✅ SSH key exists"
-          else
-            echo "❌ SSH key is missing!" && exit 1
-          fi
+          stat ~/.ssh/id_rsa || echo "SSH key is missing!"
 
       - name: Start SSH Agent and Load Key with Passphrase
         run: |
           eval "$(ssh-agent -s)"
           sudo apt-get update && sudo apt-get install -y expect
-          expect -c "
-          spawn ssh-add ~/.ssh/id_rsa
-          expect \"Enter passphrase for\"
-          send \"${{ secrets.PASSPHRASE }}\r\"
-          expect eof
-          "
+          if [ -f ~/.ssh/id_rsa ]; then
+            expect <<EOF
+            spawn ssh-add ~/.ssh/id_rsa
+            expect "Enter passphrase for"
+            send "${{ secrets.PASSPHRASE }}\r"
+            expect eof
+            EOF
+          else
+            echo "Error: SSH key file is missing."
+            exit 1
+          fi
           ssh-add -l  # Debugging: List added keys
 
       - name: Test SSH Connection
