@@ -17,7 +17,7 @@ jobs:
       - name: Setup SSH Key with Passphrase
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          printf "%s\n" "${{ secrets.KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
 
@@ -26,7 +26,15 @@ jobs:
           ls -lah ~/.ssh
           stat ~/.ssh/id_rsa
 
-      - name: Start SSH Agent and Load Key
+      - name: Verify Key Existence
+        run: |
+          if [ -f ~/.ssh/id_rsa ]; then
+            echo "✅ SSH key exists"
+          else
+            echo "❌ SSH key is missing!" && exit 1
+          fi
+
+      - name: Start SSH Agent and Load Key with Passphrase
         run: |
           eval "$(ssh-agent -s)"
           sudo apt-get update && sudo apt-get install -y expect
