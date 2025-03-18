@@ -17,12 +17,13 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | sed 's/\\n/\n/g' > ~/.ssh/testing_id
+          echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/testing_id
           chmod 600 ~/.ssh/testing_id
           chmod 700 ~/.ssh
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+      
 
-          
+
       - name: Debug SSH Key Permissions
         run: ls -lah ~/.ssh && cat ~/.ssh/testing_id
         
