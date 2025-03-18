@@ -25,7 +25,12 @@ jobs:
 
 
       - name: Debug SSH Key Permissions
-        run: ls -lah ~/.ssh && cat ~/.ssh/testing_id
+        run: |
+            ls -lah ~/.ssh
+            cat ~/.ssh/testing_id | head -n 5
+            echo "Permissions for testing_id:"
+            stat ~/.ssh/testing_id
+        
         
       - name: Fix SSH Permissions
         run: |
