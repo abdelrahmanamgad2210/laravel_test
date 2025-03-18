@@ -44,6 +44,12 @@ jobs:
           docker save -o laravel-app.tar laravel-app:latest 
           chmod 644 laravel-app.tar
 
+
+      - name: Debug SSH Key Format
+        run: |
+              echo "${{ secrets.KEY }}" | base64 --decode | head -n 5  # Just show first 5 lines
+
+
       - name: Copy Docker Image to DigitalOcean
         uses: appleboy/scp-action@v0.1.7
         with:
