@@ -20,7 +20,12 @@ jobs:
           echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
-
+      
+      - name: Debug SSH Key Permissions
+        run: |
+            ls -lah ~/.ssh
+            stat ~/.ssh/id_rsa
+        
       - name: Start SSH Agent and Load Key
         run: |
           eval "$(ssh-agent -s)"
