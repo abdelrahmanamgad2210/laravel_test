@@ -17,29 +17,25 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/testing_id
+          echo "${{ secrets.KEY }}" | tr -d '\r' > ~/.ssh/testing_id
           chmod 600 ~/.ssh/testing_id
           chmod 700 ~/.ssh
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-      
 
-
-      - name: Debug SSH Key Permissions
+      - name: Debug SSH Key
         run: |
-            ls -lah ~/.ssh
-            cat ~/.ssh/testing_id | head -n 5
-            echo "Permissions for testing_id:"
-            stat ~/.ssh/testing_id
-        
-        
-      - name: Fix SSH Permissions
+          echo "Checking SSH key format:"
+          file ~/.ssh/testing_id
+          echo "First few lines of key:"
+          head -n 10 ~/.ssh/testing_id
+
+      - name: Test SSH Connection
         run: |
-          chmod 700 ~/.ssh
-          chmod 600 ~/.ssh/testing_id
-
-
-      - name: Test SSH connection
-        run: ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/testing_id root@${{ secrets.HOST }} "echo '✅ SSH Connected'"
+          ssh -i ~/.ssh/testing_id -o StrictHostKeyChecking=no root@${{ secrets.HOST }} << 'EOF'
+          echo "✅ SSH Works!"
+          whoami
+          ls -lah /root
+          EOF
 
       - name: Build Laravel Docker Image
         run: |
@@ -47,30 +43,13 @@ jobs:
           docker save -o laravel-app.tar laravel-app:latest 
           chmod 644 laravel-app.tar
 
-      - name: Test SCP Manually
-        run: |
-            ls -lah ~/.ssh/
-            cat ~/.ssh/testing_id
-            ssh -i ~/.ssh/testing_id root@${{ secrets.HOST }} "echo '✅ SSH Still Works!'"
-        
-
-      - name: Copy Docker Image to DigitalOcean
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.HOST }}
-          username: root
-          key: ${{ secrets.KEY }}
-          source: laravel-app.tar
-          target: /root/
+      - name: Copy Docker Image to Server
+        run: scp -i ~/.ssh/testing_id -o StrictHostKeyChecking=no laravel-app.tar root@${{ secrets.HOST }}:/root/
 
       - name: Deploy on DigitalOcean
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.HOST }}
-          username: root
-          key: ${{ secrets.KEY }}
-          script: |
-            docker load -i /root/laravel-app.tar
-            docker-compose down
-            docker-compose up -d --build
-            docker system prune -af
+        run: |
+          ssh -i ~/.ssh/testing_id -o StrictHostKeyChecking=no root@${{ secrets.HOST }} << 'EOF'
+          docker load -i /root/laravel-app.tar
+          docker-compose up -d --build laravel-app
+          docker system prune -af
+          EOF
