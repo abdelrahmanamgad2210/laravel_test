@@ -17,9 +17,10 @@ jobs:
       - name: Setup SSH Key with Passphrase
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | base64 --decode > ~/.ssh/id_rsa
+          echo "${{ secrets.KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
+      
 
       - name: Debug SSH Key Presence
         run: |
