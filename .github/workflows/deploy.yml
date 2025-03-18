@@ -17,12 +17,12 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/actions_id
-          chmod 600 ~/.ssh/actions_id
-          ssh-keyscan -H 159.89.192.53 >> ~/.ssh/known_hosts
+          echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
 
       - name: Test SSH Connection
-        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/actions_id root@159.89.192.53 "echo '✅ SSH Connected'"
+        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@139.59.250.249 "echo '✅ SSH Connected'"
 
       - name: Build Laravel Docker Image
         run: |
@@ -33,7 +33,7 @@ jobs:
       - name: Copy Docker Image to DigitalOcean
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: 159.89.192.53
+          host: 139.59.250.249
           username: root
           key: ${{ secrets.KEY }}
           source: laravel-app.tar
@@ -42,7 +42,7 @@ jobs:
       - name: Deploy on DigitalOcean
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 159.89.192.53
+          host: 139.59.250.249
           username: root
           key: ${{ secrets.KEY }}
           script: |
