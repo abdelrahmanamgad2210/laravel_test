@@ -33,7 +33,8 @@ jobs:
           ssh-add -l  # Debugging: List added keys
 
       - name: Test SSH Connection
-        run: ssh -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH Connected'"
+        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@139.59.250.249 "echo '✅ SSH Connected'"
+
 
       - name: Build Laravel Docker Image
         run: |
