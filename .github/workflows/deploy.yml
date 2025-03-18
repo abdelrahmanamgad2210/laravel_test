@@ -38,8 +38,8 @@ jobs:
           chmod 600 ~/.ssh/testing_id
 
 
-      - name: Test SSH Connection
-        run: ssh -i ~/.ssh/testing_id root@${{ secrets.HOST }} "echo '✅ SSH Connected'"
+      - name: Test SSH connection
+        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/testing_id root@${{ secrets.HOST }} "echo '✅ SSH Connected'"
 
       - name: Build Laravel Docker Image
         run: |
