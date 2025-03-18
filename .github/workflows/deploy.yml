@@ -21,27 +21,19 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
       
-          # Convert the private key to PEM format (fixes libcrypto error)
-          ssh-keygen -p -m PEM -f ~/.ssh/id_rsa -N "${{ secrets.PASSPHRASE }}"
-      
-      - name: Start SSH Agent and Add Key
-        run: |
-          eval "$(ssh-agent -s)"
-          echo "${{ secrets.PASSPHRASE }}" | SSH_ASKPASS=/bin/cat ssh-add ~/.ssh/id_rsa
-          ssh-add -l  # Debugging: List added keys
-      
-      
-      
       - name: Debug SSH Key Permissions
         run: |
             ls -lah ~/.ssh
             stat ~/.ssh/id_rsa
         
-
+      - name: Start SSH Agent and Load Key
+        run: |
+          eval "$(ssh-agent -s)"
+          echo "${{ secrets.PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
+          ssh-add -l  # Debugging: List added keys
 
       - name: Test SSH Connection
-        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@139.59.250.249 "echo '✅ SSH Connected'"
-
+        run: ssh -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH Connected'"
 
       - name: Build Laravel Docker Image
         run: |
