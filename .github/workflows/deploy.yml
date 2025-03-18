@@ -14,15 +14,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup SSH Key
+      - name: Setup SSH Key with Passphrase
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
 
+      - name: Start SSH Agent and Load Key
+        run: |
+          eval "$(ssh-agent -s)"
+          echo "${{ secrets.PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
+          ssh-add -l  # List added keys (for debugging)
+
       - name: Test SSH Connection
-        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@139.59.250.249 "echo '✅ SSH Connected'"
+        run: ssh -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH Connected'"
 
       - name: Build Laravel Docker Image
         run: |
@@ -36,6 +42,7 @@ jobs:
           host: 139.59.250.249
           username: root
           key: ${{ secrets.KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
           source: laravel-app.tar
           target: /root/
 
@@ -45,6 +52,7 @@ jobs:
           host: 139.59.250.249
           username: root
           key: ${{ secrets.KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             docker load -i /root/laravel-app.tar
             docker-compose down
