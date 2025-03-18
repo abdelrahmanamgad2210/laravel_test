@@ -26,11 +26,7 @@ jobs:
             ls -lah ~/.ssh
             stat ~/.ssh/id_rsa
         
-      - name: Start SSH Agent and Load Key
-        run: |
-          eval "$(ssh-agent -s)"
-          echo "${{ secrets.PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
-          ssh-add -l  # Debugging: List added keys
+
 
       - name: Test SSH Connection
         run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@139.59.250.249 "echo '✅ SSH Connected'"
