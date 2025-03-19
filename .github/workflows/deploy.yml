@@ -30,6 +30,15 @@ jobs:
       - name: Test SSH Connection
         run: ssh -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH Connected'"
       
+      - name: Build Laravel Docker Image
+        run: |
+          set -e  # Stop if any command fails
+          docker build -t laravel-app:latest . || { echo "❌ Docker build failed"; exit 1; }
+          docker save -o laravel-app.tar laravel-app:latest || { echo "❌ Failed to save Docker image"; exit 1; }
+          chmod 644 laravel-app.tar
+
+
+          
       # ✅ Explicitly provide the key in SCP
       - name: Copy Docker Image to DigitalOcean
         uses: appleboy/scp-action@v0.1.7
@@ -54,4 +63,3 @@ jobs:
             docker-compose down || echo "⚠️ No existing containers to stop"
             docker-compose up -d --build || { echo "❌ Failed to start containers"; exit 1; }
             docker system prune -af
-      
