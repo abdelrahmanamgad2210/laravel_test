@@ -17,15 +17,17 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
+          echo "${{ secrets.KEY }}" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
       
+      
       - name: Start SSH Agent and Load Key
         run: |
-          eval "$(ssh-agent -s)"
-          echo "${{ secrets.PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
-          ssh-add -l  # Debugging: List added keys
+            eval "$(ssh-agent -s)"
+            echo "${{ secrets.PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
+            ssh-add -l  # Debugging: List added keys
+        
       
       - name: Test SSH Connection
         run: ssh -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH Connected'"
