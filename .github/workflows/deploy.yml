@@ -50,6 +50,11 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
 
+      
+      - name: Test SSH Connection
+        run: ssh -vvv -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no user@139.59.250.249 "echo 'SSH works!'"
+    
+
           
       # ✅ Explicitly provide the key in SCP
       - name: Copy Docker Image to DigitalOcean
