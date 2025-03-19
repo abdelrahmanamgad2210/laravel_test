@@ -14,13 +14,19 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up SSH key
+      - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.KEY }}
+          ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
+      
+      - name: Start SSH Agent and Load Key
+        run: |
+          eval "$(ssh-agent -s)"
+          echo "${{ secrets.PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
+          ssh-add -l  # Debugging: List added keys
+      
       - name: Test SSH Connection
         run: ssh -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH Connected'"
       
