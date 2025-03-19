@@ -14,61 +14,44 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup SSH Key with Passphrase
+      - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
       
-      - name: Debug SSH Key Presence
-        run: |
-          echo "Checking if the SSH key exists..."
-          ls -lah ~/.ssh
-          stat ~/.ssh/id_rsa || echo "SSH key is missing!"
-
       - name: Start SSH Agent and Load Key
         run: |
           eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_rsa
-          ssh-add -l  # Debugging: List loaded keys
-
+          echo "${{ secrets.PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
+          ssh-add -l  # Debugging: List added keys
+      
       - name: Test SSH Connection
         run: ssh -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH Connected'"
-
-      - name: Build Laravel Docker Image
-        run: |
-          set -e  # Stop if any command fails
-          docker build -t laravel-app:latest . || { echo "❌ Docker build failed"; exit 1; }
-          docker save -o laravel-app.tar laravel-app:latest || { echo "❌ Failed to save Docker image"; exit 1; }
-          chmod 644 laravel-app.tar
-
-      - name: Debug SSH Key Format
-        run: |
-          echo "${{ secrets.KEY }}" | base64 --decode | head -n 5  # Just show first 5 lines
-
+      
+      # ✅ Explicitly provide the key in SCP
       - name: Copy Docker Image to DigitalOcean
         uses: appleboy/scp-action@v0.1.7
         with:
           host: 139.59.250.249
           username: root
-          key: ${{ secrets.KEY }}
-          key_path: "~/.ssh/id_rsa"
+          key: ${{ secrets.KEY }}  # Use the key explicitly
           passphrase: ${{ secrets.PASSPHRASE }}
           source: laravel-app.tar
           target: /root/
-        continue-on-error: true  # This step won't break the workflow
-
+      
+      # ✅ Explicitly provide the key in SSH
       - name: Deploy on DigitalOcean
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 139.59.250.249
           username: root
-          key: ${{ secrets.KEY }}
+          key: ${{ secrets.KEY }}  # Use the key explicitly
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            set -e  # Stop if any command fails
-            docker load -i /root/laravel-app.tar || { echo "❌ Failed to load Docker image"; exit 1; }
+            docker load -i /root/laravel-app.tar
             docker-compose down || echo "⚠️ No existing containers to stop"
             docker-compose up -d --build || { echo "❌ Failed to start containers"; exit 1; }
             docker system prune -af
+      
