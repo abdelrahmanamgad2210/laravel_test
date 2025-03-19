@@ -17,26 +17,23 @@ jobs:
       - name: Setup SSH Key with Passphrase
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | base64 --decode > ~/.ssh/id_rsa
+          echo "${{ secrets.KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
-
+      
+      
       - name: Debug SSH Key Presence
         run: |
+          echo "Checking if the SSH key exists..."
           ls -lah ~/.ssh
-          stat ~/.ssh/id_rsa
+          stat ~/.ssh/id_rsa || echo "SSH key is missing!"
 
-      - name: Start SSH Agent and Load Key with Passphrase
+      - name: Start SSH Agent and Load Key
         run: |
           eval "$(ssh-agent -s)"
-          sudo apt-get update && sudo apt-get install -y expect
-          expect <<EOF
-          spawn ssh-add ~/.ssh/id_rsa
-          expect "Enter passphrase for"
-          send "${{ secrets.PASSPHRASE }}\r"
-          expect eof
-          EOF
-          ssh-add -l  # Debugging: List added keys
+          ssh-add ~/.ssh/id_rsa
+          ssh-add -l  # Debugging: List loaded keys
+
 
       - name: Test SSH Connection
         run: ssh -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH Connected'"
@@ -46,6 +43,12 @@ jobs:
           docker build -t laravel-app:latest .
           docker save -o laravel-app.tar laravel-app:latest 
           chmod 644 laravel-app.tar
+
+
+      - name: Debug SSH Key Format
+        run: |
+              echo "${{ secrets.KEY }}" | base64 --decode | head -n 5  # Just show first 5 lines
+
 
       - name: Copy Docker Image to DigitalOcean
         uses: appleboy/scp-action@v0.1.7
