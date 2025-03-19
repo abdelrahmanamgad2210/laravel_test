@@ -21,7 +21,6 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
       
-      
       - name: Debug SSH Key Presence
         run: |
           echo "Checking if the SSH key exists..."
@@ -34,21 +33,19 @@ jobs:
           ssh-add ~/.ssh/id_rsa
           ssh-add -l  # Debugging: List loaded keys
 
-
       - name: Test SSH Connection
         run: ssh -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH Connected'"
 
       - name: Build Laravel Docker Image
         run: |
-          docker build -t laravel-app:latest .
-          docker save -o laravel-app.tar laravel-app:latest 
+          set -e  # Stop if any command fails
+          docker build -t laravel-app:latest . || { echo "❌ Docker build failed"; exit 1; }
+          docker save -o laravel-app.tar laravel-app:latest || { echo "❌ Failed to save Docker image"; exit 1; }
           chmod 644 laravel-app.tar
-
 
       - name: Debug SSH Key Format
         run: |
-              echo "${{ secrets.KEY }}" | base64 --decode | head -n 5  # Just show first 5 lines
-
+          echo "${{ secrets.KEY }}" | base64 --decode | head -n 5  # Just show first 5 lines
 
       - name: Copy Docker Image to DigitalOcean
         uses: appleboy/scp-action@v0.1.7
@@ -60,6 +57,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           source: laravel-app.tar
           target: /root/
+        continue-on-error: true  # This step won't break the workflow
 
       - name: Deploy on DigitalOcean
         uses: appleboy/ssh-action@v1.0.3
@@ -69,7 +67,8 @@ jobs:
           key: ${{ secrets.KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            docker load -i /root/laravel-app.tar
-            docker-compose down
-            docker-compose up -d --build
+            set -e  # Stop if any command fails
+            docker load -i /root/laravel-app.tar || { echo "❌ Failed to load Docker image"; exit 1; }
+            docker-compose down || echo "⚠️ No existing containers to stop"
+            docker-compose up -d --build || { echo "❌ Failed to start containers"; exit 1; }
             docker system prune -af
