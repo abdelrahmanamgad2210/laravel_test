@@ -38,6 +38,18 @@ jobs:
           chmod 644 laravel-app.tar
 
 
+
+
+      - name: Set up SSH Key for Drone-SCP
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
           
       # ✅ Explicitly provide the key in SCP
       - name: Copy Docker Image to DigitalOcean
