@@ -17,7 +17,7 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | base64 --decode > ~/.ssh/id_rsa
+          echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
       
@@ -38,14 +38,14 @@ jobs:
           chmod 644 laravel-app.tar
 
 
-
+          
       # ✅ Explicitly provide the key in SCP
       - name: Copy Docker Image to DigitalOcean
         uses: appleboy/scp-action@v0.1.7
         with:
           host: 139.59.250.249
-          username: root
-          key: ${{ secrets.KEY }}  # Use the key explicitly
+          username: rootp
+          key: ${{ secrets.KEY }}  # Use the key exlicitly
           passphrase: ${{ secrets.PASSPHRASE }}
           source: laravel-app.tar
           target: /root/
