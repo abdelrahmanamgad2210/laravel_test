@@ -50,7 +50,7 @@ jobs:
           source: laravel-app.tar
           target: /root/
       
-      # ✅ Explicitly provide the key in SSH
+      # ✅ Explicitly provide the key in SSH#
       - name: Deploy on DigitalOcean
         uses: appleboy/ssh-action@v1.0.3
         with:
