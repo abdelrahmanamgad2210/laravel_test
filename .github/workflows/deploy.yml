@@ -51,8 +51,10 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
 
       
-      - name: Test SSH Connection
-        run: ssh -vvv -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no user@139.59.250.249 "echo 'SSH works!'"
+      - name: Debug SSH Key Format
+        run: |
+            echo "${{ secrets.KEY }}" | base64 --decode | head -n 5
+        
     
 
           
@@ -62,10 +64,12 @@ jobs:
         with:
           host: 139.59.250.249
           username: root
-          key: ${{ secrets.KEY }}  # Use the key explicitly
+          key: ${{ secrets.KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
+          key_path: "~/.ssh/id_rsa"  # Explicit key path
           source: laravel-app.tar
           target: /root/
+    
       
       # ✅ Explicitly provide the key in SSH#
       - name: Deploy on DigitalOcean
