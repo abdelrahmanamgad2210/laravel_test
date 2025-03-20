@@ -57,7 +57,7 @@ jobs:
           remote: /root/
           host: 139.59.250.249
           username: root
-          password: ${{ secrets.PASSPHRASE }}
+          # password: ${{ secrets.PASSPHRASE }}
 
     
       # ✅ Deploy on DigitalOcean via SSH
