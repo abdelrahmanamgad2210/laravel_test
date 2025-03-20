@@ -26,7 +26,7 @@ jobs:
       - name: Start SSH Agent and Load Key
         run: |
           eval "$(ssh-agent -s)"
-          SSH_ASKPASS=/bin/echo ssh-add ~/.ssh/id_rsa <<< "${{ secrets.PASSPHRASE }}"
+          echo "${{ secrets.PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
           ssh-add -l  # Debugging: List added keys
       
       # ✅ Test SSH Connection
