@@ -52,7 +52,7 @@ jobs:
 
       
       - name: Test SSH Connection
-        run: ssh -vvv -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no root@139.59.250.249 "echo 'SSH works!'"
+        run: ssh -vvv -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no user@139.59.250.249 "echo 'SSH works!'"
     
 
           
@@ -65,8 +65,7 @@ jobs:
           key: ${{ secrets.KEY }}  # Use the key explicitly
           passphrase: ${{ secrets.PASSPHRASE }}
           source: laravel-app.tar
-          target: "/var/www/html"
-
+          target: /root/
       
       # ✅ Explicitly provide the key in SSH#
       - name: Deploy on DigitalOcean
