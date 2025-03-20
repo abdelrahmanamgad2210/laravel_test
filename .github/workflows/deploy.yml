@@ -18,9 +18,10 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
+          echo "${{ secrets.KEY }}" | tr -d '\r' > ~/.ssh/id_rsa  # Remove Windows-style line endings
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
+
       
       # ✅ Load Key into SSH Agent
       - name: Start SSH Agent and Load Key
