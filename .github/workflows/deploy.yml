@@ -51,9 +51,10 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
 
       
-      - name: Debug SSH Key Format
+      - name: Debug SSH Key
         run: |
-            echo "${{ secrets.KEY }}" | base64 --decode | head -n 5
+            echo "${{ secrets.KEY }}" | base64 --decode | grep --color "PRIVATE KEY"
+        
         
     
 
