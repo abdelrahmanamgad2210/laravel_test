@@ -18,7 +18,7 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.KEY }}" | tr -d '\r' > ~/.ssh/id_rsa  # Remove Windows-style line endings
+          echo "${{ secrets.KEY }}" | tr -d '\r' > ~/.ssh/id_server  # Remove Windows-style line endings
           chmod 600 ~/.ssh/id_server
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
 
@@ -32,7 +32,7 @@ jobs:
       
       # ✅ Test SSH Connection
       - name: Debug SSH Connection
-        run: ssh -vvv -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH works!'"
+        run: ssh -vvv -i ~/.ssh/id_server -o StrictHostKeyChecking=no root@139.59.250.249 "echo '✅ SSH works!'"
 
       
       # ✅ Build Laravel Docker Image
