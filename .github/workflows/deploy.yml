@@ -53,6 +53,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           source: laravel-app.tar
           target: /root/
+          debug: true
     
       # ✅ Deploy on DigitalOcean via SSH
       - name: Deploy on DigitalOcean
