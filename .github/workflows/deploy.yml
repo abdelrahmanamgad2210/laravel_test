@@ -44,19 +44,21 @@ jobs:
           chmod 644 laravel-app.tar
 
 
-          
+
       - name: Verify Docker Image File
         run: ls -lah laravel-app.tar
         
       # ✅ Copy Docker Image to Server with Drone-SCP
-      - name: Copy single file to remote
-        uses: garygrossgarten/github-action-scp@release
+      - name: Copy Docker Image to DigitalOcean
+        uses: appleboy/scp-action@v0.1.7
         with:
-          local: laravel-app.tar
-          remote: /root/
           host: 139.59.250.249
           username: root
-          # password: ${{ secrets.PASSPHRASE }}
+          key: ${{ secrets.KEY }}  # Use same working SSH key
+          source: laravel-app.tar
+          target: /root/
+          debug: true  # Enable debugging
+
 
     
       # ✅ Deploy on DigitalOcean via SSH
