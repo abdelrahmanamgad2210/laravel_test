@@ -48,40 +48,18 @@ jobs:
       - name: Verify Docker Image File
         run: ls -lah laravel-app.tar
         
-      # ✅ Copy Docker Image to Server with Drone-SCP
-      - name: Copy Docker Image to DigitalOcean
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: 139.59.250.249
-          username: root
-          key: ${{ secrets.KEY }}  # Use same working SSH key
-          source: laravel-app.tar
-          target: /root/
-          debug: true  # Enable debugging
 
-      - name: Copy Docker Compose File to Server
+
+        
+      - name: Copy Laravel Source Code to Server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: 139.59.250.249
           username: root
           key: ${{ secrets.KEY }}
-          source: |
-            docker-compose.yml
-
-          target: /root/
-          debug: true  # Enable debug mode to check file transfer status
-
-      - name: Copy Docker Compose File to Server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-            host: 139.59.250.249
-            username: root
-            key: ${{ secrets.KEY }}
-            source: |
-              Dockerfile
-  
-            target: /root/
-            debug: true  # Enable debug mode to check file transfer status
+          source: .  # Copy everything (Laravel project)
+          target: /root/docker/
+      
 
     
       # ✅ Deploy on DigitalOcean via SSH
