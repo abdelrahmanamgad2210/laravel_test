@@ -52,7 +52,7 @@ jobs:
 
       
       - name: Test SSH Connection
-        run: ssh -vvv -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no user@139.59.250.249 "echo 'SSH works!'"
+        run: ssh -vvv -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no root@139.59.250.249 "echo 'SSH works!'"
     
 
           
