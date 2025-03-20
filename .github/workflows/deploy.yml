@@ -55,19 +55,14 @@ jobs:
           host: 139.59.250.249
           username: root
           key: ${{ secrets.KEY }}  # Use same working SSH key
-          source: laravel-app.tar
+          source: |
+              laravel-app.tar
+              Dockerfile
+              docker-compose.yml
+
           target: /root/
           debug: true  # Enable debugging
 
-      - name: Copy Docker Compose File to Server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: 139.59.250.249
-          username: root
-          key: ${{ secrets.KEY }}
-          source: docker-compose.yml  # Ensure this file is in your repo
-          target: /root/
-          debug: true  # Enable debug mode to check file transfer status
 
 
     
