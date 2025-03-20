@@ -49,6 +49,16 @@ jobs:
         run: ls -lah laravel-app.tar
         
       # ✅ Copy Docker Image to Server with Drone-SCP
+      - name: Copy Docker Image to DigitalOcean
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 139.59.250.249
+          username: root
+          key: ${{ secrets.KEY }}  # Use same working SSH key
+          source: laravel-app.tar
+          target: /root/
+          debug: true  # Enable debugging
+
       - name: Copy Docker Compose File to Server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -57,11 +67,21 @@ jobs:
           key: ${{ secrets.KEY }}
           source: |
             docker-compose.yml
-            laravel-app.tar
-          target: /root/docker/
-          debug: true
 
+          target: /root/
+          debug: true  # Enable debug mode to check file transfer status
 
+      - name: Copy Docker Compose File to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+            host: 139.59.250.249
+            username: root
+            key: ${{ secrets.KEY }}
+            source: |
+              Dockerfile
+  
+            target: /root/
+            debug: true  # Enable debug mode to check file transfer status
 
     
       # ✅ Deploy on DigitalOcean via SSH
@@ -74,7 +94,7 @@ jobs:
           
           script: |
             docker load -i /root/laravel-app.tar
-            cd /root/docker/
+            cd /root/
             ls -la
             docker-compose down || echo "⚠️ No existing containers to stop"
             docker-compose up -d --build || { echo "❌ Failed to start containers"; exit 1; }
