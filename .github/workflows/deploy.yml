@@ -50,16 +50,15 @@ jobs:
                 IdentitiesOnly yes" >> ~/.ssh/config
 
       # ✅ Copy Docker Image to Server with Drone-SCP
-      - name: Copy Docker Image to DigitalOcean
-        uses: appleboy/scp-action@v0.1.7
+      - name: Copy single file to remote
+        uses: garygrossgarten/github-action-scp@release
         with:
+          local: laravel-app.tar
+          remote: /root/
           host: 139.59.250.249
           username: root
-          key: ${{ secrets.KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          source: laravel-app.tar
-          target: /root/
-          debug: true
+          password: ${{ secrets.PASSPHRASE }}
+
     
       # ✅ Deploy on DigitalOcean via SSH
       - name: Deploy on DigitalOcean
