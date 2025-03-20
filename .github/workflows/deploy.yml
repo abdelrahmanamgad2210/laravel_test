@@ -47,7 +47,7 @@ jobs:
       - name: Copy single file to remote
         uses: garygrossgarten/github-action-scp@release
         with:
-          local: .env
+          local: laravel.app.tar
           remote: /root/
           host: 139.59.250.249
           username: root
