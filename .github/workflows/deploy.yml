@@ -65,7 +65,7 @@ jobs:
           key: ${{ secrets.KEY }}  # Use the key explicitly
           passphrase: ${{ secrets.PASSPHRASE }}
           source: laravel-app.tar
-          target: "~/images"
+          target: "/var/www/html"
 
       
       # ✅ Explicitly provide the key in SSH#
