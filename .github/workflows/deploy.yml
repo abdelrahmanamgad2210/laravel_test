@@ -47,7 +47,7 @@ jobs:
 
       - name: Verify Docker Image File
         run: ls -lah laravel-app.tar
-        s
+        
       # ✅ Copy Docker Image to Server with Drone-SCP
       - name: Copy Docker Image to DigitalOcean
         uses: appleboy/scp-action@v0.1.7
