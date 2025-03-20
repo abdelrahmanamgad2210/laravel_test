@@ -68,7 +68,7 @@ jobs:
           host: 139.59.250.249
           username: root
           key: ${{ secrets.KEY }}  # Use the key explicitly
-          passphrase: ${{ secrets.PASSPHRASE }}
+          
           script: |
             docker load -i /root/laravel-app.tar
             docker-compose down || echo "⚠️ No existing containers to stop"
