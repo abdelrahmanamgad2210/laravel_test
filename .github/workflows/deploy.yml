@@ -19,7 +19,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.KEY }}" | tr -d '\r' > ~/.ssh/id_rsa  # Remove Windows-style line endings
-          chmod 600 ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_server
           ssh-keyscan -H 139.59.250.249 >> ~/.ssh/known_hosts
 
       
@@ -27,7 +27,7 @@ jobs:
       - name: Start SSH Agent and Load Key
         run: |
           eval "$(ssh-agent -s)"
-          echo "${{ secrets.PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
+          echo "${{ secrets.PASSPHRASE }}" | ssh-add ~/.ssh/id_server
           ssh-add -l  # Debugging: List added keys
       
       # ✅ Test SSH Connection
