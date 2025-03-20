@@ -70,7 +70,9 @@ jobs:
           key: ${{ secrets.KEY }}  # Use the key explicitly
           
           script: |
-            docker load -i /root/laravel-app.tar
+            docker load -i /root/laravel-app.tar.
+            cd /root/
+            ls -la
             docker-compose down || echo "⚠️ No existing containers to stop"
             docker-compose up -d --build || { echo "❌ Failed to start containers"; exit 1; }
             docker system prune -af
