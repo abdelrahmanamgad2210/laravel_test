@@ -17,12 +17,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy Laravel application files
 COPY . .
 
+# Ensure that storage and bootstrap/cache directories are writable
+RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
 # Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader
-
-# Set correct permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Expose port 9000
 EXPOSE 9000
